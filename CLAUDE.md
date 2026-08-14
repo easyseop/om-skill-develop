@@ -28,20 +28,23 @@
 - 사람 결정 항목(Q1~Q9 류)은 Claude도 코덱스도 임의 확정하지 않는다. 선택지·권고안으로 사용자에게 올린다.
 - "테스트 N개 전부 green"은 신뢰 근거가 아니다. 알려진 mutant/반례가 실제로 실패하는지가 기준.
 
-## 현재 상태 (2026-08-14 마지막 세션 기준 — 이후는 git log와 om_plan/06 참조)
+## 현재 상태 (2026-08-14 구현·원격 푸시 완료 기준)
 
-- `/om-plan` 설계: 1차 적대적 검토 → 코덱스 수정 → **2차 재검토 통과("구현 승인 검토 가능")**
-- 저장소 경계: **D안 확정** — openmetadata-test 안에 `acgh/plancore`(제품 무관) + `acgh/integrations/om` 경계, 경계 lint test, 도입 시 clean export
-- 사람 결정: **Q1=C, Q2=A, Q4=B, Q5=B 확정**, Q3·Q6·Q7·Q8·Q9 보류
-- 코덱스에게 구현 착수 프롬프트 전달됨 → **다음 단계: 코덱스의 구현 보고가 오면 3차 검토**(반례가 진짜 잡는지 / plancore 경계 준수 / 1.13.1 initial·change + 1.13.2 upgrade 예행연습 결과) 후 push 승인
-- 상세 경위: `om_plan/00~06`, 경계 검토: `REVIEW_구현저장소_경계_결과_20260814.md`
-- 설계 패키지·1/2차 검토 결과 원본: `../deliverables/claude-om-command-review-20260814/`
+- `/om-plan` 1차 구현은 `easyseop/openmetadata-test`의 `codex/om-plan-impl-20260814`에 푸시됐다.
+- 구현 기준 commit은 `a564d483e2c9727ffdaff6bea67662a24232bbb2`, tree는 `0b3fe7314853f668c37668936a212d6bd43a325f`다.
+- 구현 범위: Schema·preflight·validate·2계층 marker Hook·공식 문서 수집·initial/feature/change/upgrade 수집·안전한 proposal-only resume다. 운영용 `.claude/skills` 설치는 아직 하지 않았다.
+- 저장소 경계는 D안(`acgh/plancore` 제품 무관 + `acgh/integrations/om` 제품 전용)이며 경계 lint 반례가 포함됐다.
+- 확정 결정: **Q1=C, Q2=A, Q4=B, Q5=B**. 보류: **Q3·Q6·Q7·Q8·Q9**. 보류 항목을 임의로 채우지 않는다.
+- 1.13.1 initial/change 두 경로와 1.13.2 upgrade 예행연습은 완료됐다. 결과의 `approval`은 사람이 계획을 검토할 준비가 됐다는 뜻이지, 코드 구현·배포 승인이 아니다.
+- **다음 단계는 3차 적대적 구현 검토**다. 시작점과 자료 목록은 `om_plan/07_구현완료_및_다음작업_인수인계_20260814.md`, 그대로 사용할 프롬프트는 `om_plan/08_Claude_3차_구현검토_지시문_20260814.md`에 있다.
+- 상세 설계 경위: `om_plan/00~06`, 저장소 경계 검토: `REVIEW_구현저장소_경계_결과_20260814.md`.
 
 ## 환경 주의사항 (이 컴퓨터 한정 이슈 포함)
 
 - 이 Mac의 셸은 `grep`/`rg`/`find` 함수 래퍼가 깨져 있을 수 있음("claude native binary not installed") → `command grep`, `command find`로 우회.
 - openmetadata-test의 fetch refspec이 브랜치별 제한이라, 새 브랜치 push 후 `@{upstream}` 조회가 실패하면 해당 브랜치의 refspec 한 줄을 추가해야 한다 (기존 관례 따름).
 - 관련 로컬 랩: `~/openmetadata-lab` (OM 1.13.2 서버가 Colima 위에 상주 — 계약 테스트 실환경).
+- `/private/tmp/om-plan-rehearsal.*` 아래 예행연습 결과는 임시 증거다. 다른 컴퓨터에는 전달되지 않으므로 원격 코드·테스트·인수인계 문서를 정본으로 사용한다.
 
 ## 스킬 (claude-skill-by-seop에서 설치)
 
