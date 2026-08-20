@@ -88,6 +88,7 @@ allowed-tools:
   - `change`이면 `references/change.md`를 읽는다.
   - `upgrade`이면 `references/upgrade.md`를 읽는다.
 - 산출물: 모드가 요구하는 proposal 문서 초안(매니페스트·계약·명단 항목·공유 영향·질문 등).
+- 규칙: 관리 파일 필드 중 무엇을 제안하고 무엇을 손대지 말지(사람 몫·승인 시 자동 파생)는 `references/management-files.md`를 따른다.
 - 검증: 각 관찰 주장에 사실 근거(evidence_refs)가 연결돼 있다.
 - 실패 시: 근거를 댈 수 없는 주장은 제거하거나 질문으로 전환한다.
 
@@ -164,3 +165,4 @@ allowed-tools:
 - proposal 문서 스키마와 검사기 검증 규칙이 필요할 때 `references/proposal-format.md`를 읽는다.
 - proposal 완성 형태가 필요할 때 확정된 모드의 `references/example-<mode>-proposal.md`를 읽는다(initial·change·feature·upgrade).
 - 4단계에서 확정된 모드의 `references/<mode>.md`를 읽는다.
+- 관리 파일 필드의 변경 조건·주체(제안/사람/자동)가 필요할 때 `references/management-files.md`를 읽는다.
