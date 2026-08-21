@@ -16,12 +16,14 @@ LLM은 `proposal/` 폴더에 YAML 문서를 쓴다. 검사기(`plan check`)가 �
 
 `decisions`의 각 항목은 매핑이며 아래 **6개 필드를 모두** 가져야 한다. 하나라도 없으면 거부된다.
 
-- `subject`: 이 결정이 다루는 대상(예: 커스터마이징 ID·제목).
-- `decision`: 무엇을 하기로 했는지.
+- `subject`: 이 결정이 다루는 대상(예: 커스터마이징 ID·제목). **타입: 비어있지 않은 문자열.**
+- `decision`: 무엇을 하기로 했는지. **타입: 비어있지 않은 문자열.**
 - `decision_source`: 반드시 `proposed`·`human_input`·`observed` 중 하나. (그 외 값은 거부)
-- `evidence_refs`: 아래 "evidence_refs 형식"을 따르는 근거 리스트. `decision_source: observed`이면 비어 있으면 안 된다.
-- `affected_customization_ids`: 영향받는 커스터마이징 ID 리스트.
-- `required_follow_up`: 남은 후속 작업(없으면 빈 리스트나 명시적 "none").
+- `evidence_refs`: 아래 "evidence_refs 형식"을 따르는 근거 리스트. **타입: 리스트.** `decision_source: observed`이면 비어 있으면 안 된다.
+- `affected_customization_ids`: 영향받는 커스터마이징 ID 리스트. **타입: 문자열 리스트(모든 원소가 문자열).**
+- `required_follow_up`: 남은 후속 작업. **타입: 리스트, 또는 후속 없음을 뜻하는 문자열 `"none"`.**
+
+> 타입이 위와 다르면(예: `affected_customization_ids`를 리스트가 아닌 문자열로 씀) 검사기가 block한다. 필드가 "있는데 타입이 틀린" 경우를 잡는다(필드 부재는 위 "6개 필드" 규칙이 잡는다).
 
 ## evidence_refs 형식 (검사기 강제)
 
