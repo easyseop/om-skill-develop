@@ -28,16 +28,42 @@
 - 사람 결정 항목(Q1~Q9 류)은 Claude도 코덱스도 임의 확정하지 않는다. 선택지·권고안으로 사용자에게 올린다.
 - "테스트 N개 전부 green"은 신뢰 근거가 아니다. 알려진 mutant/반례가 실제로 실패하는지가 기준.
 
-## 현재 상태 (2026-08-14 구현·원격 푸시 완료 기준)
+## 현재 상태 (2026-08-21 기준) — 다른 컴퓨터/새 세션은 여기부터
 
-- `/om-plan` 1차 구현은 `easyseop/openmetadata-test`의 `codex/om-plan-impl-20260814`에 푸시됐다.
-- 구현 기준 commit은 `a564d483e2c9727ffdaff6bea67662a24232bbb2`, tree는 `0b3fe7314853f668c37668936a212d6bd43a325f`다.
-- 구현 범위: Schema·preflight·validate·2계층 marker Hook·공식 문서 수집·initial/feature/change/upgrade 수집·안전한 proposal-only resume다. 운영용 `.claude/skills` 설치는 아직 하지 않았다.
-- 저장소 경계는 D안(`acgh/plancore` 제품 무관 + `acgh/integrations/om` 제품 전용)이며 경계 lint 반례가 포함됐다.
-- 확정 결정: **Q1=C, Q2=A, Q4=B, Q5=B**. 보류: **Q3·Q6·Q7·Q8·Q9**. 보류 항목을 임의로 채우지 않는다.
-- 1.13.1 initial/change 두 경로와 1.13.2 upgrade 예행연습은 완료됐다. 결과의 `approval`은 사람이 계획을 검토할 준비가 됐다는 뜻이지, 코드 구현·배포 승인이 아니다.
-- **다음 단계는 3차 적대적 구현 검토**다. 시작점과 자료 목록은 `om_plan/07_구현완료_및_다음작업_인수인계_20260814.md`, 그대로 사용할 프롬프트는 `om_plan/08_Claude_3차_구현검토_지시문_20260814.md`에 있다.
-- 상세 설계 경위: `om_plan/00~06`, 저장소 경계 검토: `REVIEW_구현저장소_경계_결과_20260814.md`.
+### 전체 그림
+4단계 파이프라인(계획 `/om-plan` → 반영 `/om-apply` → 검증 `/om-verify` → 요약 `/om-report`)을 만든다. 기능을 **커스텀 ID로 등록·관리**하고 그 기준으로 자동 운영하는 게 목표. **공유용 요약은 `skill_develop/공유정리/`**(주간보고 메인 + om-plan 하위 + README)에 있고 om-skill-develop(GitHub)에 push됨.
+
+### 역할 (재확인)
+- **Claude = 검증자·기록자·번역자·git대행(구현 아님).** 코덱스 트리엔 커밋 금지, om-skill-develop 등 사용자 저장소만 커밋.
+- **Codex = 구현자.**
+
+### 참고 저장소 (위 "저장소 지도" 참조)
+- **om-skill-develop**(GitHub, `skill_develop/`) = **원천**. 설계·검토·결정 문서 + 스킬 원본. Claude가 커밋. **PUBLIC 이므로 내부 GitLab 주소 금지.**
+- **검사기 clean-export**(`work/kb-datacatalog-upgrade-checker-om-plan-cli`, remote gitlab-checker) = 배포용 "도구". Codex 소유. `plan` 계열만 있음(apply/watch 등은 트림됨).
+- **완전본 트리**(`work/review-openmetadata-test-om-plan`) = 예전 넓은 하네스(apply·bootstrap·watch·risk 등 ~20명령, om-plan보다 먼저 2026-07-30 생성). apply 코드가 여기 있음.
+
+### 어디까지 했나
+- **/om-plan(계획, 1단계): 기능 완성·Claude 검증 완료.** 4모드(initial/feature/change/upgrade) + 품질 게이트 전부:
+  - 커스텀별 관계 fact 보존 / direct_tests 제거(계약only) / 수정 시 테스트 누락 차단 / 계획서 타입검사 / 경로수 기준 정정 / 업그레이드 3층 검증.
+  - 검증완료 3커밋으로 분리 완료(clean-export 브랜치 `codex/om-plan-verified-gates-20260820`, HEAD `7c544efb2b`, 전체 210 테스트 green). **push 안 함**(GitLab 보류).
+- **/om-apply(반영, 2단계): 설계 초안만.** `om_plan/58_omapply_설계범위서_초안_20260821.md`. **방식 A 확정(LLM이 코드 작성)**, ★관리파일 싱크 불변식(§0.5), 6요구 반영. 기존 apply는 "이미 만든 변경 등록(B형)"이라 A의 "코드 작성" 앞단은 신규·뒷단 기계는 재활용 **후보**(단 아래 ★재검토 필요).
+- **/om-verify·/om-report: 미착수.**
+
+### 지금 단계 (다음 액션)
+1. **om-apply 설계 초안(58)을 Codex 적대검토**에 넘긴다(§3 해석규칙·§4 최소단위·§6 게이트·A의 근본위험 깨보기).
+2. 검토 후 → **om-apply 하위페이지(계획까지)** 작성(om-plan 하위처럼) → 그 뒤 구현 지시서.
+
+### 보류·열린 것
+- **GitLab push + 파이프라인 초록불**: Q9(exit2→CI성공, 이미 로컬 구현 `2194c414ab`)를 GitLab 반영 후 4모드 파이프라인 통과해야 배포. 지금 보류.
+- **사람 결정 대기**: Q10 재베이스 단계(A~D, D 권고), Q21 등록밖 게이트 배선, 8-2 om-apply 패키징 위치.
+- **★ 예전 apply 재검토 필요(사용자 지시)**: `work/review-openmetadata-test-om-plan/harness/acgh/registration_prep.py`는 **다른 용도로 만든 구버전(2026-07-30)**이라 **현재 관리파일 구조·정책(트랙A 게이트·direct_tests 정리·매니페스트 구조 등)과 맞는지 불명.** om-apply가 재활용하려면 **그 전에 이 코드가 지금 정책에 부합하는지 별도 재검토** 필요. 부합 안 하면 재활용 대신 A형 전용 신규 로직. (Codex 적대검토 59 항목6에서 착수하되, 그 이상으로 "현재 정책 부합 여부"를 별도로 봐야 함.)
+- **확정된 임시결정·재검토 대상**: `om_plan/24_...`의 "★ 재검토 대상(R-1~R-5)" 표가 정본. (기준선 잠금 릴리즈-only 등)
+
+### 핵심 문서 포인터
+- **결정기록(정본)**: `om_plan/24_누락감사_사람결정과_기록_20260820.md`
+- **공유 요약**: `공유정리/` (README부터)
+- **om-apply 설계**: `om_plan/58_...` / **커밋분리 결과**: `om_plan/57_...` / **재베이스·게이트 조사**: `om_plan/55_...`
+- (구 08-14 인수인계·경위는 `om_plan/07·08`, `00~06` 참고 — 역사)
 
 ## 환경 주의사항 (이 컴퓨터 한정 이슈 포함)
 
