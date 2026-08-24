@@ -51,14 +51,14 @@
   - 설계서 `om_plan/58_...`, Codex 검토 `om_plan/60_...`(P0 3건 등), 공유용 논의정리 `공유정리/하위_om-apply_논의정리_20260821.md`.
   - **확정 결정**: 방식 A(LLM이 코드 작성) / 관리파일 **3방향 대조**(계획·실제diff·관리파일 — 코드=매니페스트 2개만 보면 자기세탁 가능) / 계획범위 우선 개발, 이탈 시 **민감=STOP·그외=사유+사람승인**(v1) / **독립검토 sub-agent는 우선순위0 향후개선** / 병합실패 **3단복구**(LLM고치기→재계획→사람) / 실행검사 **컴파일·생성기 포함** / 예전 apply **부분 재활용만**(안전 primitive) / **clean-export 편입** / 계약충족은 verify 몫(claim만).
   - **검토 중**: 계획 밖 '안전 유형 자동통과' 도입 여부.
-- **/om-verify(검증, 3단계): v1 구현 완료 + Claude 독립검증 통과(2026-08-24).** clean-export 미커밋(verifycore/ + om/verify.py + 반례 19, 전체 259 green). 게이트 45종·retries=0·receipt local-issued 한계 명시. 결과 77·검증 78. **다음 = 실데이터 리허설**(선행물: build receipt 생성 절차·lab 정비 — 78 §5). 설계 `73`·적대검토 `75`(P0 5건: 테스트 재계산·전체 인계·빌드 영수증·skip 차단·receipt 신뢰) → **구현 정본 `76`**. 본체(pytest, 옛 실행기 pytest_runs/testruns 이관) + UI층 부품 슬롯. **test-agent 채택 확정**(사람 결정 — OM lab 파일럿 통과 doc 72, 정형 I/O 계약 뒤 교체가능 구조). 다음 = 설계 적대검토 + V-1~V-3 사람 결정(환경 기동 A/B/C 등).
+- **/om-verify(검증, 3단계): v1 완성 — 실데이터 리허설 통과 + Claude 재검증 통과(2026-08-24).** 실제 BANK-OM-005 후보를 이미지로 빌드(build receipt local-issued)→fresh compose(`omv005-*`, :18585)로 기동→브라우저 계약 테스트(`test_hangul_composition_roundtrip`) 실서버 pass 1/skip 0→`verified(0)` receipt(digest 재계산 일치). probe 4종(딴 서버/등록자료 변조/전부 skip/run-dir 재사용) 전부 정확한 코드로 차단 — run-dir 재사용은 Claude가 직접 재현. 상주 lab·활성 등록자료·검사기 HEAD `7c544efb2b` 불변, fresh 환경 정리 완료. **파이프라인 ①plan→②apply→③verify 실물 연결 확인.** clean-export 미커밋(verifycore/ + om/verify.py + 반례 19, 전체 259 green). 설계 `73`·적대검토 `75`→정본 `76`→구현 77·검증 78→리허설 지시 79·결과 80·**재검증 81**. 남은위험 6건은 81 §참조(공식 Dockerfile 재현성·local-issued 한계·test-agent meta.run_id 등). **test-agent 채택 확정**(파일럿 72; 이번 리허설에선 meta.run_id null로 UI 부품 미결속 — not_configured). **다음 = om-verify 커밋분리·push 여부 사람 결정.**
 - **/om-report: 미착수.**
 
 ### 지금 단계 (다음 액션)
-1. om-apply 변경(미커밋 12파일) **commit 분리·push 여부 — 사람 결정 대기.**
-2. **om-verify(3단계) 설계 착수** — awaiting_verify payload(candidate SHA/tree+required tests)를 받아 실제 계약 테스트 실행. (설계→적대검토→구현 순서 유지.)
+1. om-apply·om-verify 변경(clean-export 미커밋) **commit 분리·push 여부 — 사람 결정 대기.**
+2. **om-report(4단계) 설계 착수 여부 — 사람 결정.** (설계→적대검토→구현 순서 유지.)
 3. (병행) GitLab 서버 회복 시 om-plan 브랜치 push 재시도(문서 62).
-4. 기록된 후속: P0-2 활성잠금(R-1·R-2와 함께)·P1-2~5·upgrade 독립 문서검토 배선(리허설 66·68 참조).
+4. 기록된 후속: P0-2 활성잠금(R-1·R-2와 함께)·P1-2~5·upgrade 독립 문서검토 배선(리허설 66·68)·om-verify 남은위험 6건(81).
 
 ### 보류·열린 것
 - **GitLab push + 파이프라인 초록불**: Q9(exit2→CI성공, 이미 로컬 구현 `2194c414ab`)를 GitLab 반영 후 4모드 파이프라인 통과해야 배포. 지금 보류.
