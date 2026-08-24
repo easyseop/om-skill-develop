@@ -46,7 +46,7 @@
 - **/om-plan(계획, 1단계): 기능 완성·Claude 검증 완료.** 4모드(initial/feature/change/upgrade) + 품질 게이트 전부:
   - 커스텀별 관계 fact 보존 / direct_tests 제거(계약only) / 수정 시 테스트 누락 차단 / 계획서 타입검사 / 경로수 기준 정정 / 업그레이드 3층 검증.
   - 검증완료 3커밋으로 분리 완료(clean-export 브랜치 `codex/om-plan-verified-gates-20260820`, HEAD `7c544efb2b`, 전체 210 테스트 green). **push 안 함**(GitLab 보류).
-- **/om-apply(반영, 2단계): v1 구현 완료 + Claude 검증 통과(2026-08-24).** clean-export 브랜치 위 **미커밋** 작업트리(applycore/ + integrations/om/apply.py + skills/om-apply + 반례 24개, 전체 235 테스트 green). 성공 상태는 `static_consistent_awaiting_verify` 뿐(계약충족은 claim만). 결과서 `om_plan/63_...`(Codex가 작성 시)·검증 `om_plan/64_...`. **다음 = 실데이터(1.13.1 change/1.13.2 upgrade) 예행연습 → 통과 후 commit·push 사람 결정.**
+- **/om-apply(반영, 2단계): v1 완성 — 실데이터 재리허설 통과(2026-08-24).** 리허설이 찾은 P0(전역경로 검사 결함) 수정 + 활성 공유소유맵 정정(사람 승인) 후, 실제 BANK-OM-005 change가 **`static_consistent_awaiting_verify` + eligible:true 도달**, 우회 반례는 여전히 차단, 239 테스트 green(Claude 재검증 69). 여전히 clean-export **미커밋 12파일**. 계약 테스트는 미실행(=om-verify 몫). clean-export 브랜치 위 **미커밋** 작업트리(applycore/ + integrations/om/apply.py + skills/om-apply + 반례 24개, 전체 235 테스트 green). 성공 상태는 `static_consistent_awaiting_verify` 뿐(계약충족은 claim만). 결과서 `om_plan/63_...`(Codex가 작성 시)·검증 `om_plan/64_...`. **다음 = 실데이터(1.13.1 change/1.13.2 upgrade) 예행연습 → 통과 후 commit·push 사람 결정.**
   - (설계 경위) 설계+적대검토+사람결정:
   - 설계서 `om_plan/58_...`, Codex 검토 `om_plan/60_...`(P0 3건 등), 공유용 논의정리 `공유정리/하위_om-apply_논의정리_20260821.md`.
   - **확정 결정**: 방식 A(LLM이 코드 작성) / 관리파일 **3방향 대조**(계획·실제diff·관리파일 — 코드=매니페스트 2개만 보면 자기세탁 가능) / 계획범위 우선 개발, 이탈 시 **민감=STOP·그외=사유+사람승인**(v1) / **독립검토 sub-agent는 우선순위0 향후개선** / 병합실패 **3단복구**(LLM고치기→재계획→사람) / 실행검사 **컴파일·생성기 포함** / 예전 apply **부분 재활용만**(안전 primitive) / **clean-export 편입** / 계약충족은 verify 몫(claim만).
@@ -54,9 +54,10 @@
 - **/om-verify·/om-report: 미착수.**
 
 ### 지금 단계 (다음 액션)
-1. **om-apply 실데이터 예행연습**(Codex): 실제 1.13.1 change·1.13.2 upgrade 자료로 `apply start → LLM 반영 → apply check → verify 인계` 확인.
-2. 예행연습 통과 후 → om-apply 변경 **commit 분리·push 여부 사람 결정**.
-3. (병행 가능) GitLab 서버 회복 시 om-plan 브랜치 push 재시도(문서 62).
+1. om-apply 변경(미커밋 12파일) **commit 분리·push 여부 — 사람 결정 대기.**
+2. **om-verify(3단계) 설계 착수** — awaiting_verify payload(candidate SHA/tree+required tests)를 받아 실제 계약 테스트 실행. (설계→적대검토→구현 순서 유지.)
+3. (병행) GitLab 서버 회복 시 om-plan 브랜치 push 재시도(문서 62).
+4. 기록된 후속: P0-2 활성잠금(R-1·R-2와 함께)·P1-2~5·upgrade 독립 문서검토 배선(리허설 66·68 참조).
 
 ### 보류·열린 것
 - **GitLab push + 파이프라인 초록불**: Q9(exit2→CI성공, 이미 로컬 구현 `2194c414ab`)를 GitLab 반영 후 4모드 파이프라인 통과해야 배포. 지금 보류.
