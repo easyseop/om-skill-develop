@@ -42,3 +42,39 @@
 ## 결과
 
 `skill_develop/om_plan/84_Codex_SKILLmd_작성결과_20260824.md`: 작성 파일 목록·각 경계 문구의 근거(파일:줄)·테스트 결과. 이후 Claude가 검증 → 커밋 → MR !2 push.
+
+---
+
+## 부록 A (보강 2026-08-24): I/O 양식·호출 체크리스트 — 구체 지시
+
+> 사용자 지적으로 보강: SKILL.md는 사용설명서이므로 아래를 **막연히 쓰지 말고 그대로 반영**할 것.
+
+### A-1. I/O 양식의 정본 = 스키마 파일 (전부 이미 저장소에 있음)
+
+SKILL.md에서 언급하는 **모든 입출력 파일은 해당 스키마 경로를 명시**하고, 필드 목록은 스키마에서 실측해 요약 기재한다(추측 금지):
+
+| 명령 | 입력(사람/LLM 작성) | 스키마 | 주요 산출 | 스키마 |
+|---|---|---|---|---|
+| plan | `run-request.yaml` | `plancore/schema/plan-run-request.schema.json` | `input-lock.yaml`·`discovered-facts.json`·`proposal/`·`validation-result.json` | plancore/schema/ 나머지 4종 |
+| apply | `apply-request.yaml` (실물 필드: schema_version·run_id·plan_run_dir·expected_plan_digest·repositories.product/checker·registration_path·start_ref) | `applycore/schema/apply-request.schema.json` | `apply-context.yaml`(실행계획)·`execution-report.yaml`(LLM 기록)·`apply-result.json` | applycore/schema/ 3종 |
+| verify | `verify-request.json` (실물 필드: apply_result_path·build_receipt_path·run_id·retries(항상 0)·prior_infra_error_count·runtime{base_url·container_id·expected_compose_project·expected_compose_config_paths·expected_volume_names·fixture_digest·fixture_evidence_path·mode}·test_environment_names·timeout_seconds) | `verifycore/schema/verify-request.schema.json` | `verify-receipt.json`(canonical_payload+receipt_digest)·`pytest/` 증거 | build-receipt·fixture-receipt·ui-component·waiver 스키마 4종 |
+
+### A-2. 각 호출은 4단 체크 형식으로 기술 (Procedure 강제 양식)
+
+모든 CLI 호출 단계는 **[호출 전 확인 → 호출 → 성공 판정 → 실패 시 행동]** 4단으로 쓴다. 최소 포함:
+
+- **plan check**: 전=run-request가 스키마 유효·모드별 필수 입력 존재. 후=exit 0/1/2/3 의미(2=사람 검토 준비 상태이며 CI에선 성공 취급[Q9], **재해석 금지**), validation-result의 게이트별 판정 읽는 법. 실패 시=제안 수정 후 재검증이지 게이트 우회 아님.
+- **apply start**: 전=승인된 plan run 실재·expected_plan_digest 일치·start_ref 40자 SHA. 후=apply-context.yaml의 DAG·management_files 확인. 실패 시=계획 문제면 재계획(수기 보정 금지).
+- **apply check**: 전=모든 unit의 start/end SHA가 execution-report에 기록됨. 후=exit 0이면 `static_consistent_awaiting_verify`(**유일 성공 상태**)·verify_handoff를 **그대로** verify에 전달, exit 1=STOP(scope_variances 사유 작성→사람 승인 대기). 실패 시=매니페스트 확장으로 통과시키기 절대 금지.
+- **verify run**: 전=**새** run-dir(재사용은 VERIFY_RUN_ALREADY_EXISTS로 거부됨)·build receipt(local-issued+source_clean)·fixture receipt·서버 기동 상태(container_id 실측). 후=status 3상태만 존재(verified 0/failed 1/infra_error 3), **skip·부분실행·WARN은 어느 것도 통과 아님**, receipt의 gates[].reason_codes로 원인 확인, trust_limitation 문구를 사람 보고에 그대로 포함. 실패 시=infra_error 반복이면 3회째 escalation(사람), receipt·산출물 수정 금지.
+
+### A-3. 케이스별 지시 (각 SKILL.md에 표 또는 절로)
+
+- **plan**: 4모드별로 [필수 입력 차이·필수 산출물 차이·대표 실패 게이트]를 표로. upgrade는 3층 검증·path-remap 필수 산출을 명시.
+- **apply**: 정상 / 민감경로 이탈(즉시 STOP) / 일반 이탈(scope_variances 4요소 사유 작성→사람) / 병합 실패(3단 복구 순서) — 각각 "LLM이 해도 되는 일·절대 안 되는 일"을 분리 기술.
+- **verify**: verified / failed / infra_error 각각에서 다음 행동(사람에게 무엇을 보고하고 무엇을 기다리는지). 대표 거부 사례 4종(다른 서버·등록자료 불일치·전부 skip·run-dir 재사용)은 "이건 고장이 아니라 차단이 작동한 것"임을 명시.
+
+### A-4. 근거 규율
+
+- 위 실물 필드명은 리허설 산출물에서 실측한 것이나, **최종 기재는 반드시 스키마·코드 재열람으로 재확인**(스키마와 이 부록이 다르면 스키마가 정본).
+- 결과서 84에 각 SKILL.md 문장 → 근거(스키마/코드 파일:줄) 대응표 포함.
