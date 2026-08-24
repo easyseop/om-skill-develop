@@ -56,7 +56,7 @@
 
 ### 지금 단계 (다음 액션)
 1. **커밋분리 완료(2026-08-24, 결과서 82)** — clean-export 브랜치에 3커밋 추가(등록자료 P0-3 정정 `411c7cfe1f` 210 green → om-apply v1 `093c5ac8b1` 239 green → om-verify v1 `82be68e733` 259 green). 누적 diff=기준선·교차오염 0 검증됨. 작업트리 clean.
-2. **GitLab push 대기 — 자격증명 필요.** 서버는 회복(401 응답). 이 Mac keychain에 해당 host 토큰 없음 → (a) 사용자 PAT로 Claude 대행 또는 (b) Codex가 push(문서 62). 브랜치 스택 6커밋(om-plan 3 + 이번 3) → MR → 파이프라인 → 사람 merge. **주의: 파이프라인은 om-plan 전용이라 apply/verify 테스트는 CI에서 안 돎(82 §4) — CI 확장 여부 후속 결정.**
+2. **GitLab push·MR 완료(2026-08-24)** — 사용자 단기 PAT로 Claude가 push 대행, 브랜치 6커밋(om-plan 3 + 이번 3) 신규 등록, **MR !2 open(target=main, 충돌 없음)**. **파이프라인은 MR에서 안 도는 게 설계**(workflow rules: web 수동 실행 + 보호된 main 한정, 82 §3). 다음 = **사람이 MR !2 검토·merge** → (원하면) 웹 UI에서 파이프라인 수동 실행. **주의: 파이프라인은 om-plan 전용이라 apply/verify 259 테스트는 CI에서 안 돎(82 §4) — CI 확장 여부 후속 결정.** 사용 후 PAT는 사용자가 revoke(1주 자동만료).
 3. **om-report(4단계) 설계 착수 여부 — 사람 결정.** (설계→적대검토→구현 순서 유지.)
 4. 기록된 후속: P0-2 활성잠금(R-1·R-2와 함께)·P1-2~5·upgrade 독립 문서검토 배선(리허설 66·68)·om-verify 남은위험 6건(81).
 

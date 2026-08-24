@@ -19,13 +19,12 @@
 - **각 커밋 시점 전체 테스트 green**: 위 표 — 격리 worktree에서 실행.
 - 작업트리 잔여 변경 0(분리 후 clean).
 
-## 3. GitLab 반영 상태
+## 3. GitLab 반영 — 완료 (2026-08-24, 사용자 PAT로 Claude 대행)
 
-- 서버 **회복 확인**: `https://…cloudfront.net/datacatalog/...git/info/refs` → HTTP 401(인증 요구 = 살아있음, 종전 504와 다름).
-- **차단 지점**: 이 Mac keychain에 해당 host의 git 자격증명 없음 → push 불가. 해소 경로 2가지(사람 선택):
-  - (a) 사용자가 GitLab PAT(write_repository)를 발급해 Claude가 push 대행 + push-option으로 MR 생성.
-  - (b) 문서 62 절차대로 Codex(자격증명 보유 환경)가 push→MR.
-- push 대상: 브랜치 전체 스택 6커밋(om-plan 3 + 이번 3). merge는 MR·파이프라인 후 사람.
+- 서버 회복 확인(401 응답) → 사용자가 단기 PAT(write_repository+read_api, 1주 만료) 발급 → Claude가 push 대행.
+- **push 완료**: 브랜치 `codex/om-plan-verified-gates-20260820` 6커밋(om-plan 3 + 이번 3) 신규 등록. 토큰은 파일·저장소에 기록하지 않음.
+- **MR !2 생성**(push option): target=main, conflicts 없음(원격 main은 우리 조상 69dd83cf + 병합커밋 1개, tree 동일 확인). merge는 사람 몫.
+- **파이프라인 미생성 = 설계된 동작**: workflow rules가 `$CI_PIPELINE_SOURCE == "web"`만 허용(그 외 never), 잡 rules는 추가로 보호된 기본 브랜치 한정. 즉 신뢰 재실행 파이프라인은 **merge 후 사람이 웹 UI에서 spec inputs(request-ref·proposal-ref·product-project 등)를 지정해 수동 실행**하는 구조. MR 단계 CI 게이트는 원래 없음(lint API로 확인: "workflow:rules로 인해 미실행").
 
 ## 4. 갭 (반영 전 알아야 할 것)
 
