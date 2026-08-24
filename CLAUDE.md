@@ -46,15 +46,17 @@
 - **/om-plan(계획, 1단계): 기능 완성·Claude 검증 완료.** 4모드(initial/feature/change/upgrade) + 품질 게이트 전부:
   - 커스텀별 관계 fact 보존 / direct_tests 제거(계약only) / 수정 시 테스트 누락 차단 / 계획서 타입검사 / 경로수 기준 정정 / 업그레이드 3층 검증.
   - 검증완료 3커밋으로 분리 완료(clean-export 브랜치 `codex/om-plan-verified-gates-20260820`, HEAD `7c544efb2b`, 전체 210 테스트 green). **push 안 함**(GitLab 보류).
-- **/om-apply(반영, 2단계): 설계 + Codex 적대검토 완료 + 사람 결정 확정.**
+- **/om-apply(반영, 2단계): v1 구현 완료 + Claude 검증 통과(2026-08-24).** clean-export 브랜치 위 **미커밋** 작업트리(applycore/ + integrations/om/apply.py + skills/om-apply + 반례 24개, 전체 235 테스트 green). 성공 상태는 `static_consistent_awaiting_verify` 뿐(계약충족은 claim만). 결과서 `om_plan/63_...`(Codex가 작성 시)·검증 `om_plan/64_...`. **다음 = 실데이터(1.13.1 change/1.13.2 upgrade) 예행연습 → 통과 후 commit·push 사람 결정.**
+  - (설계 경위) 설계+적대검토+사람결정:
   - 설계서 `om_plan/58_...`, Codex 검토 `om_plan/60_...`(P0 3건 등), 공유용 논의정리 `공유정리/하위_om-apply_논의정리_20260821.md`.
   - **확정 결정**: 방식 A(LLM이 코드 작성) / 관리파일 **3방향 대조**(계획·실제diff·관리파일 — 코드=매니페스트 2개만 보면 자기세탁 가능) / 계획범위 우선 개발, 이탈 시 **민감=STOP·그외=사유+사람승인**(v1) / **독립검토 sub-agent는 우선순위0 향후개선** / 병합실패 **3단복구**(LLM고치기→재계획→사람) / 실행검사 **컴파일·생성기 포함** / 예전 apply **부분 재활용만**(안전 primitive) / **clean-export 편입** / 계약충족은 verify 몫(claim만).
   - **검토 중**: 계획 밖 '안전 유형 자동통과' 도입 여부.
 - **/om-verify·/om-report: 미착수.**
 
 ### 지금 단계 (다음 액션)
-1. **Codex 검토(60) + 위 확정 결정을 설계서(58)에 반영** → 구현 지시서. (반영 항목: 3방향 대조로 개정, path-remap 목적지·삭제이동·공유신규 규칙, role/action DAG 최소단위, 계약충족 claim화, 최종상태 `awaiting_verify` 등 — doc 60 §7 목록.)
-2. 그 뒤 **clean-export에 om-apply 구현**(Codex). 예전 apply는 현재 정책 부합 재검토 후 안전 primitive만.
+1. **om-apply 실데이터 예행연습**(Codex): 실제 1.13.1 change·1.13.2 upgrade 자료로 `apply start → LLM 반영 → apply check → verify 인계` 확인.
+2. 예행연습 통과 후 → om-apply 변경 **commit 분리·push 여부 사람 결정**.
+3. (병행 가능) GitLab 서버 회복 시 om-plan 브랜치 push 재시도(문서 62).
 
 ### 보류·열린 것
 - **GitLab push + 파이프라인 초록불**: Q9(exit2→CI성공, 이미 로컬 구현 `2194c414ab`)를 GitLab 반영 후 4모드 파이프라인 통과해야 배포. 지금 보류.
